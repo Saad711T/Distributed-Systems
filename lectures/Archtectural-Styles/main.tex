@@ -1,0 +1,317 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{listings}
+
+\title{Architectural Styles}
+\author{0xSaad}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+There are different ways to view the organization of distributed systems:
+
+\begin{itemize}
+    \item Software Architecture: The logical organization.
+    \item System Architecture: The actual physical realization.
+\end{itemize}
+
+\subsection{Component}
+
+A modular unit with well-defined interfaces that is replaceable within its environment.
+
+\subsection{Connector}
+
+A mechanism that mediates communication, coordination, or cooperation among components.
+
+Examples:
+\begin{itemize}
+    \item RPC (Remote Procedure Call)
+    \item Messaging
+    \item Streaming
+\end{itemize}
+
+\subsubsection{Event-Based Architectures}
+
+Components communicate via events using the Publish/Subscribe paradigm.
+
+\begin{itemize}
+    \item Components can publish and subscribe to events.
+    \item Events are delivered to subscribers.
+    \item Processes are decoupled in space.
+    \item Processes are coupled in time.
+\end{itemize}
+
+Types:
+
+\begin{itemize}
+    \item Subject-Based: A message belongs to groups, channels, or topics. Users subscribe to these groups and receive associated messages.
+    \item Content-Based: Message delivery is based on a query or predicate issued by the subscriber.
+\end{itemize}
+
+\subsubsection{Object-Based Architectures}
+
+\begin{itemize}
+    \item Components interact via RPC.
+    \item Each object corresponds to a software component.
+\end{itemize}
+
+A remote object provides a service comprising a set of functions.
+
+The service description includes function names, argument numbers and types, and return types.
+
+\paragraph{CORBA}
+
+Common Object Request Broker Architecture.
+
+An industry standard for distributed objects programming.
+
+\paragraph{Java RMI}
+
+Remote Method Invocation allows an object running in one Java Virtual Machine to invoke methods on an object running in another Java VM.
+
+\paragraph{Amazon S3}
+
+Objects (files) are placed into buckets (directories).
+
+Buckets cannot be placed inside other buckets.
+
+\begin{itemize}
+    \item PUT: Create a bucket or object.
+    \item GET: List objects in a bucket.
+    \item GET: Read an object using its URI.
+\end{itemize}
+
+\section{What Are the Different Software Architectures?}
+
+\begin{itemize}
+    \item Layered Architectures
+    \item Event-Based Architectures
+    \item Data-Centered Architectures
+    \item Object-Based Architectures
+    \item Shared Data-Space Architectures
+\end{itemize}
+
+\section{System Architectures}
+
+\begin{itemize}
+    \item Centralized: Client-Server systems and Multitiered systems (Servers as clients).
+    \item Decentralized: Peer-to-Peer systems.
+    \item Hybrid: Client-Server + Decentralized.
+\end{itemize}
+
+\subsection{Layered Architecture}
+
+Components are organized in a layered fashion.
+
+A component at layer $L_i$ is allowed to call components at the lower layer $L_{i-1}$, not the other way around.
+
+Control flows from layer to layer (down), and responses flow upwards (up).
+
+\subsubsection{Example: OSI Model}
+
+The OSI model is a conceptual model that characterizes and standardizes communication functions.
+
+It consists of seven layers:
+
+\begin{enumerate}
+    \item Application
+    \item Presentation
+    \item Session
+    \item Transport
+    \item Network
+    \item Data Link
+    \item Physical
+\end{enumerate}
+
+\IfFileExists{images/osi.png}{
+    \includegraphics[width=0.5\textwidth]{images/osi.png}
+}{
+    \textit{OSI diagram: images/osi.png}
+}
+
+\subsubsection{Levels}
+
+\begin{itemize}
+    \item User-Interface Level: Provides access to the user with the system.
+    \item Processing Level: Contains the applications in the system.
+    \item Data Level: Manages the data in the system.
+\end{itemize}
+
+\subsection{Data-Centered Architecture}
+
+Processes communicate through a common repository.
+
+\begin{itemize}
+    \item Evolves around the data.
+    \item Communication takes place through files.
+    \item Examples: Web-based distributed systems and Distributed Database Systems.
+\end{itemize}
+
+\subsection{Shared Data-Space Architecture}
+
+Combines Event-Based and Data-Centric architectural styles.
+
+Processes communicate through a common repository.
+
+\begin{itemize}
+    \item Publishers post items to a shared data space.
+    \item Subscribers access items at a later time.
+    \item Processes are decoupled in both space and time.
+\end{itemize}
+
+\subsubsection{JavaSpaces}
+
+A JavaSpace is a Jini service that stores Java objects in memory.
+
+It supports collaboration among services.
+
+Operations:
+
+\begin{itemize}
+    \item Write: Write an object to JavaSpace.
+    \item Read: Return a copy and leave the object in JavaSpace.
+    \item Take: Return a copy and remove the object from JavaSpace.
+    \item Notify: Register a callback to be notified when changes occur.
+\end{itemize}
+
+\subsection{Client-Server Architecture}
+
+\begin{itemize}
+    \item Client: A process that requests a service from a server.
+    \item Server: A process that offers a service, such as a file or database service.
+\end{itemize}
+
+\subsubsection{Steps at Client}
+
+\begin{enumerate}
+    \item Make a message for the server.
+    \item Identify the service the client wants.
+    \item Send the message to the server.
+\end{enumerate}
+
+\subsubsection{Steps at Server}
+
+\begin{enumerate}
+    \item Wait for an incoming request.
+    \item Process the request.
+    \item Package the result in a reply message.
+    \item Send the reply to the client.
+\end{enumerate}
+
+Communication between client and server can use:
+
+\begin{itemize}
+    \item Connectionless Protocol (UDP): Used when the underlying network is reliable, according to the slides.
+    \item Connection-Oriented Protocol (TCP): Used when the underlying network is unreliable, according to the slides.
+\end{itemize}
+
+\subsubsection{UDP Problems}
+
+\begin{itemize}
+    \item Occasional transmission failures may occur.
+    \item The client resends the request when no reply arrives.
+    \item The client cannot determine whether the request or reply was lost.
+    \item Resending a request may execute the operation twice.
+\end{itemize}
+
+\subsubsection{TCP Steps}
+
+\begin{enumerate}
+    \item The client establishes a connection with the server.
+    \item The client sends the request.
+    \item The server sends the result using the same connection.
+    \item The connection is closed after receiving the result.
+\end{enumerate}
+
+Disadvantages mentioned in the slides:
+
+\begin{itemize}
+    \item Low performance.
+    \item Connection setup is costly for small messages.
+\end{itemize}
+
+\subsection{Multitiered Architecture}
+
+Application programs are distributed across different machines.
+
+\subsubsection{Two-Tier Organization}
+
+\begin{itemize}
+    \item Client Machine: Contains programs implementing the user-interface level.
+    \item Server Machine: Contains the processing and data levels.
+\end{itemize}
+
+\subsubsection{Three-Tier Organization}
+
+\begin{itemize}
+    \item User Interface: Presentation level.
+    \item Application Server: Processing level.
+    \item Database Server: Data level.
+\end{itemize}
+
+Request flow:
+
+\begin{enumerate}
+    \item User interface requests an operation.
+    \item Application server requests data.
+    \item Database server returns data.
+    \item Application server returns the result.
+\end{enumerate}
+
+\subsection{Layers vs. Tiers}
+
+\begin{itemize}
+    \item Layer: Logical layer, a term in Software Architecture.
+    \item Tier: Physical layer, a term in System Architecture.
+\end{itemize}
+
+\subsection{P2P Systems}
+
+Peer-to-Peer networks use distribution between equivalent peers.
+
+This is called horizontal distribution, as opposed to layered vertical distribution.
+
+Problems:
+
+\begin{itemize}
+    \item Who should store a particular data item?
+    \item How is a message routed through the peer group?
+    \item Sending messages to all peers may flood the network.
+\end{itemize}
+
+\subsection{Overlay Network}
+
+An overlay network is a logical network built on top of a physical network.
+
+Focus at the application level.
+
+\subsection{Hybrid Architecture}
+
+Hybrid Architecture combines Decentralized and Client-Server systems.
+
+\subsection{Edge-Server Systems}
+
+Servers are placed at the edge of the network.
+
+They are located at the boundary between enterprise networks and the Internet, such as an ISP.
+
+\subsection{Collaborative Distributed Systems}
+
+Components of a collaborative content distribution network:
+
+\begin{itemize}
+    \item A component that redirects client requests to other servers.
+    \item A component for analyzing access patterns.
+    \item A component for managing the replication of Web pages.
+\end{itemize}
+
+\end{document}
