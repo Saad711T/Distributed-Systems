@@ -1,0 +1,449 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{listings}
+
+\title{Peer-to-Peer Networks}
+\author{0xSaad}
+\date{\today}
+
+\setlist[itemize]{topsep=3pt,itemsep=1pt,parsep=0pt}
+\setlist[enumerate]{topsep=3pt,itemsep=1pt,parsep=0pt}
+
+\begin{document}
+
+\maketitle
+
+\section{Client/Server and Peer-to-Peer}
+
+\subsection{Client/Server Architecture}
+
+A well-known, powerful, reliable server is a data source. Clients request data from the server.
+
+Examples: WWW (HTTP), FTP, and Web services.
+
+\subsubsection{Client/Server Limitations}
+\begin{itemize}
+    \item Scalability is hard to achieve.
+    \item Presents a single point of failure.
+    \item Requires administration.
+\end{itemize}
+
+P2P systems try to address these limitations.
+
+\subsection{P2P Computing}
+
+P2P computing is the sharing of computer resources and services by direct exchange between systems.
+
+\begin{itemize}
+    \item Resources include information, processing cycles, cache storage, and disk storage for files.
+    \item P2P takes advantage of existing computing power, storage, and networking connectivity.
+\end{itemize}
+
+\subsection{P2P Architecture}
+\begin{itemize}
+    \item All nodes are both clients and servers: they provide and consume data.
+    \item Any node can initiate a connection.
+    \item No centralized data source.
+\end{itemize}
+
+\subsubsection{P2P Network Characteristics}
+\begin{itemize}
+    \item Clients are also servers and routers; nodes contribute content, storage, memory, and CPU.
+    \item Nodes are autonomous (no administrative authority).
+    \item The network is dynamic: nodes frequently enter and leave.
+    \item Nodes collaborate directly, not through well-known servers.
+    \item Nodes have widely varying capabilities.
+\end{itemize}
+
+\subsubsection{P2P Benefits}
+\begin{itemize}
+    \item Efficient use of resources: unused bandwidth, storage, and processing power at the edge of the network.
+    \item Scalability: consumers also donate resources; aggregate resources grow with utilization.
+    \item Reliability: replicas, geographic distribution, and no single point of failure.
+    \item Ease of administration: self-organizing nodes, fault tolerance, replication, and load balancing.
+\end{itemize}
+
+\subsubsection{P2P Applications}
+\begin{itemize}
+    \item File sharing: Napster, Gnutella, Kazaa.
+    \item Multiplayer games: Unreal Tournament, DOOM.
+    \item Collaborative applications: ICQ, shared whiteboard.
+    \item Distributed computation: SETI@home.
+    \item Ad-hoc networks.
+\end{itemize}
+
+Large-scale file sharing may raise issues of copyright infringement.
+
+\section{P2P Search Architectures}
+
+\subsection{Approaches}
+\begin{itemize}
+    \item Centralized: Napster.
+    \item Flooding or Decentralized: Gnutella.
+    \item Hybrid (Centralized and Decentralized) with Super-Peers: KaZaA.
+    \item Document Routing (Structured): Chord and CAN.
+\end{itemize}
+
+\subsection{Napster (Centralized)}
+
+A system for sharing music files using centralized searching and direct peer-to-peer file transfer.
+
+\begin{enumerate}
+    \item Users upload their file lists to the Napster server.
+    \item Users send keyword queries to the server (artist, song, album, bitrate, etc.).
+    \item The server replies with IP addresses of users with matching files.
+    \item Users connect directly to another peer to download the file.
+\end{enumerate}
+
+\subsubsection{Napster Properties}
+\begin{itemize}
+    \item A central server can ensure correct search results.
+    \item The server is a bottleneck for scalability.
+    \item Single point of failure.
+    \item Susceptible to denial of service, malicious users, lawsuits, and legislation.
+    \item Search is centralized; file transfer is direct (peer-to-peer).
+\end{itemize}
+
+\subsection{Gnutella (Flooding)}
+
+A decentralized P2P system that shares any type of files, not only music.
+
+\begin{enumerate}
+    \item A peer asks its neighbors for files of interest.
+    \item Neighbors forward the query to their neighbors, and so on.
+    \item A TTL (Time To Live) field stops messages after a number of hops.
+    \item Peers with matching files reply to the requester.
+\end{enumerate}
+
+\subsubsection{Gnutella Properties}
+\begin{itemize}
+    \item Decentralized, with no single point of failure.
+    \item Not as susceptible to denial of service.
+    \item Cannot ensure correct results.
+    \item Flooding makes search distributed but still not scalable.
+\end{itemize}
+
+\subsection{KaZaA (FastTrack Network)}
+
+A hybrid of centralized Napster and decentralized Gnutella.
+
+\begin{itemize}
+    \item Super-Peers act as local search hubs, like Napster servers for small portions of the network.
+    \item Super-Peers are automatically selected by capacity (storage, bandwidth) and availability (connection time).
+    \item Users upload file lists to a Super-Peer.
+    \item Super-Peers periodically exchange file lists.
+    \item Users send file queries to a Super-Peer.
+\end{itemize}
+
+\subsection{Free Riding}
+
+File-sharing networks rely on users sharing data.
+
+Two types of free riding:
+\begin{itemize}
+    \item Downloading but not sharing any data.
+    \item Not sharing any interesting data.
+\end{itemize}
+
+On Gnutella, the study cited in the slides reports:
+\begin{itemize}
+    \item 15\% of users contribute 94\% of content.
+    \item 63\% of users never responded to a query.
+\end{itemize}
+
+\subsection{Anonymity and Freenet}
+
+Napster, Gnutella, and Kazaa do not provide anonymity: users know who they download from, and others know who sent a query.
+
+Freenet is designed to provide anonymity.
+
+\begin{itemize}
+    \item Data flows in the reverse path of the query.
+    \item It is impossible to know if a user is initiating or forwarding a query, or consuming or forwarding data, in the model described in the slides.
+    \item ``Smart'' queries route requests toward the correct peer by incremental discovery.
+\end{itemize}
+
+\subsubsection{Freenet Routing Tables}
+\begin{itemize}
+    \item \texttt{id}: File identifier (e.g., hash of file).
+    \item \texttt{next\_hop}: Another node that stores the file ID.
+    \item \texttt{file}: File identified by the ID, stored at the local node.
+\end{itemize}
+
+Forwarding a query for a file ID:
+\begin{enumerate}
+    \item If the file is stored locally, stop and forward data back to the upstream requester.
+    \item Otherwise, find the closest ID in the routing table and forward to its \texttt{next\_hop}.
+    \item If data is not found, report failure; the requester tries the next closest match.
+\end{enumerate}
+
+\section{Structured P2P and Distributed Hash Tables}
+
+\subsection{Structured P2P}
+
+Second-generation P2P overlay networks based on a Distributed Hash Table (DHT) interface.
+
+\begin{itemize}
+    \item Self-organizing.
+    \item Load balanced.
+    \item Fault-tolerant.
+    \item Scalable guarantees on the number of hops to answer a query, unlike unstructured P2P systems.
+\end{itemize}
+
+\subsection{Distributed Hash Tables (DHT)}
+
+A distributed version of a hash table data structure that stores \texttt{(key, value)} pairs.
+
+\begin{itemize}
+    \item The key is like a filename; the value can be file contents.
+    \item Goal: Efficiently insert, lookup, and delete \texttt{(key, value)} pairs.
+    \item Each peer stores a subset of the key-value pairs.
+    \item Core operation: Find the node responsible for a key.
+    \item Map a key to a node and efficiently route requests to that node.
+\end{itemize}
+
+\subsubsection{Directed Searches}
+\begin{itemize}
+    \item Assign particular nodes to hold particular content, or know where it is.
+    \item A request goes toward the node responsible for the content.
+    \item Challenges: Evenly distributing responsibilities and adapting to nodes joining, leaving, or failing.
+    \item Give responsibilities to joining nodes; redistribute responsibilities from leaving nodes.
+\end{itemize}
+
+\subsubsection{Hash Tables and DHTs}
+\begin{itemize}
+    \item A hash table associates data with keys and hashes a key to find a bucket.
+    \item Each bucket is expected to hold \(\text{items}/\text{buckets}\) items.
+    \item In a DHT, nodes are the hash buckets: a key is hashed to find its responsible peer.
+    \item Data and load are balanced across nodes.
+\end{itemize}
+
+\subsubsection{DHT Applications}
+\begin{itemize}
+    \item File sharing and archival storage.
+    \item Databases.
+    \item Naming and service discovery.
+    \item Chat service.
+    \item Rendezvous-based communication.
+    \item Publish/Subscribe.
+\end{itemize}
+
+\subsubsection{DHT Desirable Properties}
+\begin{itemize}
+    \item Keys are mapped evenly to nodes (e.g., 10 keys and 5 peers: 2 keys per peer).
+    \item Each node maintains information about only a few other nodes.
+    \item Messages are routed efficiently.
+    \item Node arrivals and departures affect only a few nodes.
+\end{itemize}
+
+\subsubsection{DHT Routing Protocols}
+
+DHT is a generic interface with several implementations:
+\begin{itemize}
+    \item Chord (MIT).
+    \item Pastry (Microsoft Research UK, Rice University).
+    \item Tapestry and CAN (UC Berkeley).
+    \item SkipNet, Kademlia, Viceroy, P-Grid, and Freenet.
+\end{itemize}
+
+These systems are called P2P routing substrates or P2P overlay networks.
+
+\section{Chord}
+
+\subsection{Chord API}
+\begin{itemize}
+    \item Node ID: Unique \(m\)-bit identifier (hash of IP address or another unique ID).
+    \item Key: \(m\)-bit identifier (hash of a sequence of bytes).
+    \item Value: Sequence of bytes.
+\end{itemize}
+
+Operations:
+\begin{itemize}
+    \item \texttt{insert(key, value)}: Store key/value at \(r\) nodes.
+    \item \texttt{lookup(key)}.
+    \item \texttt{update(key, newval)}.
+    \item \texttt{join(n)}.
+    \item \texttt{leave()}.
+\end{itemize}
+
+\subsection{Chord Properties}
+
+In a system with \(N\) nodes and \(K\) keys, with high probability, the slides give:
+\begin{itemize}
+    \item Key responsibility on the order of \(K/N\) per node.
+    \item Each node maintains information about \(O(\log N)\) other nodes.
+    \item Lookups are resolved in \(O(\log N)\) hops.
+    \item No delivery guarantees.
+    \item No consistency among replicas.
+\end{itemize}
+
+\subsection{Chord Identifier Ring}
+
+Chord uses a circular \(m\)-bit ID space for both keys and nodes:
+\[
+0,1,\ldots,2^m-1.
+\]
+
+\begin{itemize}
+    \item Node ID: SHA-1 of an IP address (as shown in the slides).
+    \item Key ID: SHA-1 of a key.
+    \item A key maps to the first node whose ID is equal to or follows the key ID on the ring.
+    \item Each node is responsible for \(O(K/N)\) keys; \(O(K/N)\) keys move when a node joins or leaves.
+\end{itemize}
+
+Example: \(m=6\), so \(2^6=64\) possible IDs (0--63).
+
+With nodes \(\{1,8,14,21,32,38,42,48,51,56\}\), the mappings illustrated in the slides include:
+\[
+K10\to N14,\quad K24\to N32,\quad K30\to N32,\quad
+K38\to N38,\quad K54\to N56.
+\]
+
+\subsection{Chord State and Lookup}
+
+\subsubsection{Basic Chord}
+\begin{itemize}
+    \item Each node knows its Successor and Predecessor (for ring management).
+    \item Lookup requests are forwarded around the ring through Successor pointers.
+    \item Requires \(O(N)\) hops.
+\end{itemize}
+
+\subsubsection{Finger Table}
+\begin{itemize}
+    \item Each node knows \(m\) other positions on the ring.
+    \item Finger \(i\) of node \(n\) points to the Successor of \(n+2^i\).
+    \item Lookup follows the closest preceding fingers and then the Successor.
+    \item Requires \(O(\log N)\) hops.
+\end{itemize}
+
+\[
+\operatorname{finger}_i(n)=\operatorname{successor}\bigl((n+2^i)\bmod 2^m\bigr),
+\qquad i=0,\ldots,m-1.
+\]
+
+Finger table for \(N8\) when \(m=6\), as in the slides:
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+\(i\) & \(N8+2^i\) & Successor \\
+\midrule
+0 & 9  & N14 \\
+1 & 10 & N14 \\
+2 & 12 & N14 \\
+3 & 16 & N21 \\
+4 & 24 & N32 \\
+5 & 40 & N42 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Chord Join and Routing}
+
+In the identifier space \([0,7]\), \(m=3\).
+
+\begin{itemize}
+    \item Node \(n1\) joins first: every Successor-table entry points to \(n1\).
+    \item Node \(n2\) joins: the Successor tables change.
+    \item Nodes \(n0\) and \(n6\) join: active nodes are \(\{n0,n1,n2,n6\}\).
+    \item Items \(f1\) and \(f7\): \(f1\) maps to \(n1\), and \(f7\) maps to \(n0\).
+\end{itemize}
+
+Example Successor tables for the four active nodes (each row lists entries for \(i=0,1,2\)):
+
+\begin{center}
+\begin{tabular}{cl}
+\toprule
+Node & Successor-table entries \\
+\midrule
+\(n0\) & \(n1,\ n2,\ n6\) \\
+\(n1\) & \(n2,\ n6,\ n6\) \\
+\(n2\) & \(n6,\ n6,\ n6\) \\
+\(n6\) & \(n0,\ n0,\ n2\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Upon receiving a query for an item ID:
+\begin{enumerate}
+    \item Check if the item is stored locally.
+    \item Otherwise, forward to the largest preceding node in the Successor table.
+    \item Continue until the responsible node is reached.
+\end{enumerate}
+
+Example from the slides: Query for item \(7\) from \(n1\) is routed toward \(n6\), then \(n0\).
+
+\subsection{Network Locality}
+
+Nodes close on the Chord ring can be far apart in the physical network.
+
+\section{Content Addressable Network (CAN)}
+
+\subsection{Document Routing -- CAN}
+
+CAN associates each node and item with a unique identifier in a \(d\)-dimensional space.
+
+Goals:
+\begin{itemize}
+    \item Scale to hundreds of thousands of nodes.
+    \item Handle rapid arrival and failure of nodes.
+\end{itemize}
+
+Properties:
+\begin{itemize}
+    \item Routing table size: \(O(d)\).
+    \item File location in at most \(d\,n^{1/d}\) routing steps, where \(n\) is the total number of nodes, as stated in the slides.
+\end{itemize}
+
+\subsection{CAN Two-Dimensional Space}
+\begin{itemize}
+    \item The space is divided between nodes; all nodes together cover the entire space.
+    \item Each node covers a square or rectangular area (ratios 1:2 or 2:1 in the slide example).
+    \item The first node, \(n1:(1,2)\), covers the entire space.
+    \item When \(n2:(4,2)\) joins, the space is divided between \(n1\) and \(n2\).
+    \item Later nodes join: \(n3:(3,5)\), \(n4:(5,5)\), and \(n5:(6,6)\).
+\end{itemize}
+
+\subsubsection{Data Placement}
+
+Each item is stored by the node that owns its mapped area in the coordinate space.
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+Item & Coordinates & Owning Node \\
+\midrule
+\(f1\) & \((2,3)\) & \(n1\) \\
+\(f2\) & \((5,1)\) & \(n2\) \\
+\(f3\) & \((2,1)\) & \(n1\) \\
+\(f4\) & \((7,5)\) & \(n5\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{CAN Query Routing}
+\begin{itemize}
+    \item Each node knows its neighbors in the \(d\)-dimensional space.
+    \item Forward a query to the neighbor closest to the query ID.
+    \item Slide example: \(n1\) queries item \(f4\).
+    \item CAN can route around some failures; some failures require local flooding.
+\end{itemize}
+
+\section{P2P Web}
+
+Works like an ordinary Web server, with these differences:
+\begin{itemize}
+    \item Distributed storage.
+    \item Automatic data replication.
+    \item Load balancing of users.
+    \item When the load is too high, add another server and store another copy.
+\end{itemize}
+
+\end{document}
